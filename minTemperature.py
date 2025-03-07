@@ -10,7 +10,7 @@ schema = StructType([ \
                      StructField("measure_type", StringType(), True), \
                      StructField("temperature", FloatType(), True)])
 
-df = spark.read.schema(schema).csv("1800.csv") # read file as df
+df = spark.read.schema(schema).csv("./files/1800.csv") # read file as df
 df.printSchema()
 
 minTemps = df.filter(df.measure_type == "TMIN")

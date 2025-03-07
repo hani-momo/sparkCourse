@@ -5,14 +5,14 @@ from pyspark.sql.types import StructType, StructField, IntegerType, FloatType
 spark = SparkSession.builder.appName("TotalSpentByCustomer").master("local[*]").getOrCreate()
 
 customerOrderSchema = StructType([ \
-                                  StructField("cust_id", IntegerType(), True),
+                                  StructField("customer_id", IntegerType(), True),
                                   StructField("item_id", IntegerType(), True),
                                   StructField("amount_spent", FloatType(), True)
                                   ])
 
-customersDF = spark.read.schema(customerOrderSchema).csv("customer-orders.csv")
+customersDF = spark.read.schema(customerOrderSchema).csv("./files/customer-orders.csv")
 
-totalByCustomer = customersDF.groupBy("cust_id").agg(func.round(func.sum("amount_spent"), 2)\
+totalByCustomer = customersDF.groupBy("customer_id").agg(func.round(func.sum("amount_spent"), 2)\
                                       .alias("total_spent"))
 totalByCustomerSorted = totalByCustomer.sort("total_spent")
 

@@ -3,10 +3,10 @@ from pyspark.sql import SparkSession, functions as func
 spark = SparkSession.builder.appName("FriendsByAge").getOrCreate()
 
 try:
-    lines = spark.read.option("header", "true").option("inferSchema", "true").csv("friends-by-age-dataframe.csv")
+    lines = spark.read.option("header", "true").option("inferSchema", "true").csv("./files/fakefriends-header.csv")
     
     if "age" not in lines.columns or "friends" not in lines.columns:
-        print("No suck columns")
+        print("No such columns")
     else:
         friendsByAge = lines.select("age", "friends")
         friendsByAge.groupBy("age").avg("friends").sort("age").show() # sorted
