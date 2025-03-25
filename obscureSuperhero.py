@@ -9,8 +9,8 @@ schema = StructType([ \
                      StructField("id", IntegerType(), True), \
                      StructField("name", StringType(), True)])
 
-names = spark.read.schema(schema).option("sep", " ").csv("./files/Marvel+Names.txt")
-lines = spark.read.text("./files/Marvel+Graph.txt")
+names = spark.read.schema(schema).option("sep", " ").csv("files/Marvel+Names.txt")
+lines = spark.read.text("files/Marvel+Graph.txt")
 
 connections = lines.withColumn("id", func.split(func.trim(func.col("value")), " ")[0]) \
     .withColumn("connections", func.size(func.split(func.trim(func.col("value")), " ")) - 1) \

@@ -3,7 +3,7 @@ from pyspark.sql import SparkSession, functions as func
 spark = SparkSession.builder.appName("FriendsByAge").getOrCreate()
 
 try:
-    lines = spark.read.option("header", "true").option("inferSchema", "true").csv("./files/fakefriends-header.csv")
+    lines = spark.read.option("header", "true").option("inferSchema", "true").csv("files/fakefriends-header.csv")
     
     if "age" not in lines.columns or "friends" not in lines.columns:
         print("No such columns")

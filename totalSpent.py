@@ -10,7 +10,7 @@ customerOrderSchema = StructType([ \
                                   StructField("amount_spent", FloatType(), True)
                                   ])
 
-customersDF = spark.read.schema(customerOrderSchema).csv("./files/customer-orders.csv")
+customersDF = spark.read.schema(customerOrderSchema).csv("files/customer-orders.csv")
 
 totalByCustomer = customersDF.groupBy("customer_id").agg(func.round(func.sum("amount_spent"), 2)\
                                       .alias("total_spent"))

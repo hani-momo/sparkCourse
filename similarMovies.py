@@ -47,12 +47,12 @@ movieNames = spark.read \
       .option("sep", "|") \
       .option("charset", "ISO-8859-1") \
       .schema(movieNamesSchema) \
-      .csv("file:///SparkCourse/ml-100k/u.item")
+      .csv("files/ml-100k/u.item")
 
 movies = spark.read \
       .option("sep", "\t") \
       .schema(moviesSchema) \
-      .csv("file:///SparkCourse/ml-100k/u.data")
+      .csv("files/ml-100k/u.data")
 
 
 ratings = movies.select("userId", "movieId", "rating")
@@ -68,7 +68,7 @@ moviePairs = ratings.alias("ratings1") \
 
 moviePairSimilarities = computeCosineSimilarity(spark, moviePairs).cache()
 
-if (len(sys.argv) > 1):
+if (len(sys.argv) > 1): # when running with spark-submit provide movieID as argument
     scoreThreshold = 0.97
     coOccurrenceThreshold = 50.0
 
@@ -90,3 +90,4 @@ if (len(sys.argv) > 1):
         print(getMovieName(movieNames, similarMovieID) + "\tscore: " \
               + str(result.score) + "\tstrength: " + str(result.numPairs))
         
+spark.stop()
