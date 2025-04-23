@@ -1,20 +1,56 @@
-from pyspark.sql import SparkSession, functions as func
+from pyspark.sql import SparkSession, DataFrame, functions as func
+from typing import Optional
 
-spark = SparkSession.builder.appName("FriendsByAge").getOrCreate()
 
-try:
-    lines = spark.read.option("header", "true").option("inferSchema", "true").csv("files/fakefriends-header.csv")
-    
-    if "age" not in lines.columns or "friends" not in lines.columns:
-        print("No such columns")
+def load_friends_data(
+    file_path: Optional[str] = None,
+    friends_df: Optional[DataFrame] = None
+) -> DataFrame:
+    if friends_df is not None:
+        return friends_df
+    elif file_path is not None:
+        try:
+            return spark.read.option("header", "true") \
+                             .option("inferSchema", "true") \
+                             .csv(file_path)
+        except FileNotFoundError:
+            raise FileNotFoundError(f"File not found at {file_path}")
+        except Exception as e:
+            raise ValueError(f"Error loading friends data: {e}")
     else:
-        friendsByAge = lines.select("age", "friends")
-        friendsByAge.groupBy("age").avg("friends").sort("age").show() # sorted
-        friendsByAge.groupBy("age").agg(func.round(func.avg("friends"), 2) # rounded & separate column name
-                                        .alias("friends_avg")).sort("age").show()
+        raise ValueError("Either file_path or friends_df must be provided")
+    
 
-except Exception as e:
-    print(f"ERR OCCURED: {e}")
+def process_friends_data(
+    spark: SparkSession, 
+    file_path: Optional[str] = None,
+    friends_df: Optional[DataFrame] = None
+) -> DataFrame:
+    try:
+        df = load_friends_data(file_path=file_path, friends_df=friends_df)
+        if "age" not in lines.columns or "friends" not in lines.columns:
+            raise ValueError("Missing age or friends columns")
+        
+        result = df.select("age", "friends")\
+            .groupBy("age").agg(func.avg("friends").alias("friends_avg")) \
+            .sort("age")
+        
+        return result
 
-finally:
-    spark.stop()
+    except Exception as e:
+        raise ValueError(f"Error processing friends data: {e}") from e
+
+
+def main() -> None:
+    spark = SparkSession.builder.appName("friendsByAge").getOrCreate()
+    try:
+        result = process_friends_data(
+            spark, 
+            file_path="files/fakefriends-header.csv",
+        )
+        result.show(10, truncate=False)
+    finally:
+        spark.stop()
+
+if __name__ == "__main__":
+    main()
