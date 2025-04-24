@@ -50,5 +50,3 @@ def test_find_most_popular_movies(spark_session, input_sample_ratings_df, input_
     ''' Test top_movies func '''
     result = top_movies(spark_session, input_sample_ratings_df, input_sample_movie_dict)
     assert result.first()["movieID"] == 1
-# тестируем функциональность бизнес-логики
-# тест должен принимать session, input и output
