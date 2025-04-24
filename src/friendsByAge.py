@@ -3,6 +3,7 @@ from typing import Optional
 
 
 def load_friends_data(
+    spark: SparkSession,
     file_path: Optional[str] = None,
     friends_df: Optional[DataFrame] = None
 ) -> DataFrame:
@@ -24,11 +25,11 @@ def load_friends_data(
 def process_friends_data(
     spark: SparkSession, 
     file_path: Optional[str] = None,
-    friends_df: Optional[DataFrame] = None
+    friends_df: Optional[DataFrame] = None # modify code
 ) -> DataFrame:
     try:
-        df = load_friends_data(file_path=file_path, friends_df=friends_df)
-        if "age" not in lines.columns or "friends" not in lines.columns:
+        df = load_friends_data(spark=spark, file_path=file_path, friends_df=friends_df)
+        if "age" not in lines.columns or "friends" not in lines.columns: # ??
             raise ValueError("Missing age or friends columns")
         
         result = df.select("age", "friends")\
@@ -45,7 +46,7 @@ def main() -> None:
     spark = SparkSession.builder.appName("friendsByAge").getOrCreate()
     try:
         result = process_friends_data(
-            spark, 
+            spark=spark, 
             file_path="files/fakefriends-header.csv",
         )
         result.show(10, truncate=False)
