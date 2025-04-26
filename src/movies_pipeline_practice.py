@@ -12,6 +12,7 @@ HOW TO USE:
 
 spark-submit src/movies_pipeline_practice.py --debug --log-level DEBUG
 spark-submit src/movies_pipeline_practice.py --log-level INFO
+or see Makefile
 '''
 
 DEBUG = False
