@@ -1,0 +1,18 @@
+## default configrations for movies_pipeline_practice
+
+
+spark_config:
+  app_name: 'MoviesPipelinePractice'
+  config:
+    spark.sql.shuffle.partitions: 4
+    spark.sql.adaptive.enabled: true
+
+debug: false
+
+encoding: "ISO-8859-1"
+
+data_paths:
+  ratings: "./files/ml-100k/u.data"
+  movies: "./files/ml-100k/u.item"
+
+log_level: "INFO"
