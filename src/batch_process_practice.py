@@ -1,4 +1,4 @@
-from pyspark.sql import SparkSession, functions as func, DataFrame
+from pyspark.sql import SparkSession, Ftions as F, DataFrame
 import logging
 
 logging.basicConfig(level=logging.INFO)
@@ -12,16 +12,16 @@ def top_5_performing_partners(df: DataFrame) -> DataFrame: # VCR = Video views/ 
     '''
     return (df
             .filter(
-                (func.col('video_completes') > 0) & 
-                (func.col('impressions') > 0))
+                (F.col('video_completes') > 0) & 
+                (F.col('impressions') > 0))
             .groupBy('site')
             .agg(
-                (func.sum('video_views') / func.sum('video_completes')).alias('VCR'),
-                (func.sum('video_views') / func.sum('impressions')).alias('VTR')
+                (F.sum('video_views') / F.sum('video_completes')).alias('VCR'),
+                (F.sum('video_views') / F.sum('impressions')).alias('VTR')
             )
             .orderBy(
-                func.desc('VCR'),
-                func.desc('VTR')
+                F.desc('VCR'),
+                F.desc('VTR')
             )
             .limit(5))
 
@@ -33,21 +33,21 @@ def campaign_partner_device_metrics(df: DataFrame) -> DataFrame: # CPC / CTR, CP
     '''
     return (df
               .filter(
-                  (func.col('clicks') > 0) &
-                  (func.col('impressions') > 0) &
-                  (func.col('actualized_spend') > 0)
+                  (F.col('clicks') > 0) &
+                  (F.col('impressions') > 0) &
+                  (F.col('actualized_spend') > 0)
               )
               .groupBy('campaign', 'site', 'device')
               .agg(
-                  (func.sum('clicks') / func.sum('impressions') * 100).alias('CTR(%)'),  # CTR (Click Through Rate) as percentage
-                  (func.sum('actualized_spend') / func.sum('clicks')).alias('CPC($)'),  # CPC (Cost Per Click) - total spend divided by total clicks
-                  func.sum('impressions').alias('total_impressions'),
-                  func.sum('clicks').alias('total_clicks'),
-                  func.sum('actualized_spend').alias('total_spend')
+                  (F.sum('clicks') / F.sum('impressions') * 100).alias('CTR(%)'),  # CTR (Click Through Rate) as percentage
+                  (F.sum('actualized_spend') / F.sum('clicks')).alias('CPC($)'),  # CPC (Cost Per Click) - total spend divided by total clicks
+                  F.sum('impressions').alias('total_impressions'),
+                  F.sum('clicks').alias('total_clicks'),
+                  F.sum('actualized_spend').alias('total_spend')
               )
               .orderBy(
-                  func.desc('CTR(%)'),
-                  func.asc('CPC($)')
+                  F.desc('CTR(%)'),
+                  F.asc('CPC($)')
               ))
 
 def video_completion_rate(df: DataFrame) -> DataFrame:
@@ -59,21 +59,21 @@ def video_completion_rate(df: DataFrame) -> DataFrame:
         not_completed_percent
     '''
     return (df
-              .filter(func.col('video_views') > 0)
+              .filter(F.col('video_views') > 0)
               .groupBy('campaign', 'site')
               .agg(
-                  func.sum('video_completes').alias('total_video_completed'),
-                  func.sum('video_views').alias('total_video_views')
+                  F.sum('video_completes').alias('total_video_completed'),
+                  F.sum('video_views').alias('total_video_views')
               ) 
               .withColumn(
                   'completion_percent',
-                  (func.col('total_video_completed') / func.col('total_video_views')) * 100
+                  (F.col('total_video_completed') / F.col('total_video_views')) * 100
               )
               .withColumn(
                   'not_completed_percent',
-                  100 - func.col('completion_percent')
+                  100 - F.col('completion_percent')
               )
-              .orderBy(func.desc('not_completed_percent')))
+              .orderBy(F.desc('not_completed_percent')))
 
 def engagement_rate_by_channel(df: DataFrame) -> DataFrame:
     '''
@@ -82,12 +82,12 @@ def engagement_rate_by_channel(df: DataFrame) -> DataFrame:
         channel, engagement_rate
     '''
     return (df
-            .filter(func.col('impressions') > 0)
+            .filter(F.col('impressions') > 0)
             .groupBy('channel')
             .agg(
-                (func.sum('engagements') / func.sum('impressions')).alias('engagement_rate')
+                (F.sum('engagements') / F.sum('impressions')).alias('engagement_rate')
             )
-            .orderBy(func.desc('engagement_rate')))
+            .orderBy(F.desc('engagement_rate')))
 
 def main():
     spark = SparkSession.builder.appName("Batch Process Practice").getOrCreate()
